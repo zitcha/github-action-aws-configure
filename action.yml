@@ -16,6 +16,14 @@ inputs:
   ENVIRONMENT_AWS_MAPPINGS:
     required: true
 
+outputs:
+  account-id:
+    account-id: ${{ steps.aws-info.outputs.account-id }}
+  region:
+    region: ${{ steps.aws-info.outputs.region }}
+  github-oidc-role-arn:
+    github-oidc-role-arn: ${{ steps.aws-info.outputs.github-oidc-role-arn }}
+
 runs:
   using: "composite"
   steps:
@@ -26,8 +34,11 @@ runs:
       ENVIRONMENT_AWS_MAPPINGS: ${{ inputs.ENVIRONMENT_AWS_MAPPINGS }}
     run: |
       ACCOUNT_ID=$(echo "${ENVIRONMENT_AWS_MAPPINGS}" | jq '."${{ inputs.env-name }}".accountId')
-      echo $ACCOUNT_ID
+      REGION=$(echo "${ENVIRONMENT_AWS_MAPPINGS}" | jq '."${{ inputs.env-name }}".region')
+      GITHUB_OIDC_ROLE_ARN=$(echo "${ENVIRONMENT_AWS_MAPPINGS}" | jq '."${{ inputs.env-name }}".githubOidcRoleArn')
       echo "account-id=${ACCOUNT_ID}" >> "$GITHUB_OUTPUT"
+      echo "region=${REGION}" >> "$GITHUB_OUTPUT"
+      echo "github-oidc-role-arn=${GITHUB_OIDC_ROLE_ARN}" >> "$GITHUB_OUTPUT"
 
   - name: Debug
     shell: bash
