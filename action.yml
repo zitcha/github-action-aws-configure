@@ -18,11 +18,11 @@ inputs:
 
 outputs:
   account-id:
-    account-id: ${{ steps.aws-info.outputs.account-id }}
+    value: ${{ steps.aws-info.outputs.account-id }}
   region:
-    region: ${{ steps.aws-info.outputs.region }}
+    value: ${{ steps.aws-info.outputs.region }}
   github-oidc-role-arn:
-    github-oidc-role-arn: ${{ steps.aws-info.outputs.github-oidc-role-arn }}
+    value: ${{ steps.aws-info.outputs.github-oidc-role-arn }}
 
 runs:
   using: "composite"
