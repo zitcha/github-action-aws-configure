@@ -13,6 +13,8 @@ author: Sam Anthony
 inputs:
   env-name:
     required: true
+  ENVIRONMENT_AWS_MAPPINGS:
+    required: true
 
 runs:
   using: "composite"
@@ -21,7 +23,7 @@ runs:
     id: aws-info
     shell: bash
     env:
-      ENVIRONMENT_AWS_MAPPINGS: ${{ vars.ENVIRONMENT_AWS_MAPPINGS }}
+      ENVIRONMENT_AWS_MAPPINGS: ${{ inputs.ENVIRONMENT_AWS_MAPPINGS }}
     run: |
       ACCOUNT_ID=$(echo "${ENVIRONMENT_AWS_MAPPINGS}" | jq '."${{ inputs.env-name }}".accountId')
       echo $ACCOUNT_ID
