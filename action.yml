@@ -11,22 +11,34 @@ author: Sam Anthony
 
 
 inputs:
-  role-to-assume:
+  env-name:
     required: true
-    description: A preconfigured IAM Role ARN
-  aws-region:
-    default: 'ap-southeast-2'
 
 runs:
   using: "composite"
   steps:
-  - name: Configure AWS credentials debug info
+  - name: Determine Region and IAM Role
+    id: aws-info
+    shell: bash
+    env:
+      ENVIRONMENT_AWS_MAPPINGS: ${{ vars.ENVIRONMENT_AWS_MAPPINGS }}
+    run: |
+      ACCOUNT_ID=$(echo "${ENVIRONMENT_AWS_MAPPINGS}" | jq '."${{ inputs.env-name }}".accountId')
+      echo $ACCOUNT_ID
+      echo "account-id=${ACCOUNT_ID}" >> "$GITHUB_OUTPUT"
+
+  - name: Debug
     shell: bash
     run: |
-      echo "Attempting to use role '${{ inputs.role-to-assume }}'"
-  - name: Configure AWS credentials
-    uses: aws-actions/configure-aws-credentials@v4
-    with:
-      role-to-assume: ${{ inputs.role-to-assume }}
-      role-session-name: GitHub_to_AWS_via_FederatedOIDC # I think this value is arbitrary
-      aws-region: ${{ inputs.aws-region }}
+      echo "${{ steps.aws-info.outputs.account-id }}"      
+
+#  - name: Configure AWS credentials debug info
+#    shell: bash
+#    run: |
+#      echo "Attempting to use role '${{ inputs.role-to-assume }}'"
+#  - name: Configure AWS credentials
+#    uses: aws-actions/configure-aws-credentials@v4
+#    with:
+#      role-to-assume: ${{ inputs.role-to-assume }}
+#      role-session-name: GitHub_to_AWS_via_FederatedOIDC # I think this value is arbitrary
+#      aws-region: ${{ inputs.aws-region }}
