@@ -33,9 +33,9 @@ runs:
     env:
       ENVIRONMENT_AWS_MAPPINGS: ${{ inputs.ENVIRONMENT_AWS_MAPPINGS }}
     run: |
-      ACCOUNT_ID=$(echo "${ENVIRONMENT_AWS_MAPPINGS}" | jq '."${{ inputs.env-name }}".accountId')
-      REGION=$(echo "${ENVIRONMENT_AWS_MAPPINGS}" | jq '."${{ inputs.env-name }}".region')
-      GITHUB_OIDC_ROLE_ARN=$(echo "${ENVIRONMENT_AWS_MAPPINGS}" | jq '."${{ inputs.env-name }}".githubOidcRoleArn')
+      ACCOUNT_ID=$(echo "${ENVIRONMENT_AWS_MAPPINGS}" | jq -r '."${{ inputs.env-name }}".accountId')
+      REGION=$(echo "${ENVIRONMENT_AWS_MAPPINGS}" | jq -r '."${{ inputs.env-name }}".region')
+      GITHUB_OIDC_ROLE_ARN=$(echo "${ENVIRONMENT_AWS_MAPPINGS}" | jq -r '."${{ inputs.env-name }}".githubOidcRoleArn')
       echo "account-id=${ACCOUNT_ID}" >> "$GITHUB_OUTPUT"
       echo "region=${REGION}" >> "$GITHUB_OUTPUT"
       echo "github-oidc-role-arn=${GITHUB_OIDC_ROLE_ARN}" >> "$GITHUB_OUTPUT"
@@ -49,8 +49,6 @@ runs:
   - name: Configure AWS credentials
     uses: aws-actions/configure-aws-credentials@v4
     with:
-#      role-to-assume: "arn:aws:iam::265954534166:role/UniversalMain-GithubActionsIamRole46AD3469-12V4PJUUZSIIF"
       role-to-assume: ${{ steps.aws-info.outputs.github-oidc-role-arn }}
       role-session-name: GitHub_to_AWS_via_FederatedOIDC # I think this value is arbitrary
-#      aws-region: ap-southeast-2
-      aws-region: "${{ steps.aws-info.outputs.region }}"
+      aws-region: ${{ steps.aws-info.outputs.region }}
