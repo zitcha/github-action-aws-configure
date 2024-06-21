@@ -40,15 +40,12 @@ runs:
       echo "region=${REGION}" >> "$GITHUB_OUTPUT"
       echo "github-oidc-role-arn=${GITHUB_OIDC_ROLE_ARN}" >> "$GITHUB_OUTPUT"
 
-  - name: Debug
+  - name: debug info
     shell: bash
     run: |
-      echo "${{ steps.aws-info.outputs.account-id }}"      
-
-  - name: Configure AWS credentials debug info
-    shell: bash
-    run: |
-      echo "Attempting to use role '${{ steps.aws-info.outputs.github-oidc-role-arn }}'"
+      echo "Account Id: '${{ steps.aws-info.outputs.account-id }}'"
+      echo "Region: '${{ steps.aws-info.outputs.region }}'"
+      echo "Role: '${{ steps.aws-info.outputs.github-oidc-role-arn }}'"
   - name: Configure AWS credentials
     uses: aws-actions/configure-aws-credentials@v4
     with:
