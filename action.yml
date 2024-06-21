@@ -48,10 +48,10 @@ runs:
   - name: Configure AWS credentials debug info
     shell: bash
     run: |
-      echo "Attempting to use role '${{ inputs.role-to-assume }}'"
+      echo "Attempting to use role '${{ steps.aws-info.outputs.github-oidc-role-arn }}'"
   - name: Configure AWS credentials
     uses: aws-actions/configure-aws-credentials@v4
     with:
       role-to-assume: "${{ steps.aws-info.outputs.github-oidc-role-arn }}"
       role-session-name: GitHub_to_AWS_via_FederatedOIDC # I think this value is arbitrary
-      aws-region: "${{ steps.aws-info.outputs.region }}"
+      aws-region: ${{ steps.aws-info.outputs.region }}
