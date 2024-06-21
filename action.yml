@@ -51,4 +51,5 @@ runs:
     with:
       role-to-assume: "${{ steps.aws-info.outputs.github-oidc-role-arn }}"
       role-session-name: GitHub_to_AWS_via_FederatedOIDC # I think this value is arbitrary
-      aws-region: ${{ steps.aws-info.outputs.region }}
+      aws-region: ap-southeast-2
+#      aws-region: ${{ steps.aws-info.outputs.region }}
