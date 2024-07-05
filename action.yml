@@ -11,22 +11,44 @@ author: Sam Anthony
 
 
 inputs:
-  role-to-assume:
+  env-name:
     required: true
-    description: A preconfigured IAM Role ARN
-  aws-region:
-    default: 'ap-southeast-2'
+  ENVIRONMENT_AWS_MAPPINGS:
+    required: true
+
+outputs:
+  account-id:
+    value: ${{ steps.aws-info.outputs.account-id }}
+  region:
+    value: ${{ steps.aws-info.outputs.region }}
+  github-oidc-role-arn:
+    value: ${{ steps.aws-info.outputs.github-oidc-role-arn }}
 
 runs:
   using: "composite"
   steps:
-  - name: Configure AWS credentials debug info
+  - name: Determine Region and IAM Role
+    id: aws-info
+    shell: bash
+    env:
+      ENVIRONMENT_AWS_MAPPINGS: ${{ inputs.ENVIRONMENT_AWS_MAPPINGS }}
+    run: |
+      ACCOUNT_ID=$(echo "${ENVIRONMENT_AWS_MAPPINGS}" | jq -r '."${{ inputs.env-name }}".accountId')
+      REGION=$(echo "${ENVIRONMENT_AWS_MAPPINGS}" | jq -r '."${{ inputs.env-name }}".region')
+      GITHUB_OIDC_ROLE_ARN=$(echo "${ENVIRONMENT_AWS_MAPPINGS}" | jq -r '."${{ inputs.env-name }}".githubOidcRoleArn')
+      echo "account-id=${ACCOUNT_ID}" >> "$GITHUB_OUTPUT"
+      echo "region=${REGION}" >> "$GITHUB_OUTPUT"
+      echo "github-oidc-role-arn=${GITHUB_OIDC_ROLE_ARN}" >> "$GITHUB_OUTPUT"
+
+  - name: debug info
     shell: bash
     run: |
-      echo "Attempting to use role '${{ inputs.role-to-assume }}'"
+      echo "Account Id: '${{ steps.aws-info.outputs.account-id }}'"
+      echo "Region: '${{ steps.aws-info.outputs.region }}'"
+      echo "Role: '${{ steps.aws-info.outputs.github-oidc-role-arn }}'"
   - name: Configure AWS credentials
     uses: aws-actions/configure-aws-credentials@v4
     with:
-      role-to-assume: ${{ inputs.role-to-assume }}
+      role-to-assume: ${{ steps.aws-info.outputs.github-oidc-role-arn }}
       role-session-name: GitHub_to_AWS_via_FederatedOIDC # I think this value is arbitrary
-      aws-region: ${{ inputs.aws-region }}
+      aws-region: ${{ steps.aws-info.outputs.region }}
