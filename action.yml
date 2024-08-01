@@ -1,15 +1,6 @@
 name: Configure Workflow to use AWS IAM Role
 author: Sam Anthony
 
-# NOTE: The workflow calling this must have the following permissions configured
-# permissions:
-#   id-token: write
-#   contents: read
-# https://aws.amazon.com/blogs/security/use-iam-roles-to-connect-github-actions-to-actions-in-aws/
-
-# See also https://github.com/aws-actions/configure-aws-credentials
-
-
 inputs:
   env-name:
     required: true
@@ -50,5 +41,4 @@ runs:
     uses: aws-actions/configure-aws-credentials@v4
     with:
       role-to-assume: ${{ steps.aws-info.outputs.github-oidc-role-arn }}
-      role-session-name: GitHub_to_AWS_via_FederatedOIDC # I think this value is arbitrary
       aws-region: ${{ steps.aws-info.outputs.region }}
